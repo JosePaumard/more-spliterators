@@ -10,6 +10,10 @@ The entry point of this API is meant to be the `MoreSpliterators` factory class.
 
 So far this API provides six operations
 
+## Cycling
+
+Takes a stream and repeats it forever, as long as this stream has a finite size. 
+
 ## Grouping
 
 Takes a stream `[a, b, c, d]` and returns `[[a, b], [c, d]]`. The grouping factor is parametrized.

@@ -21,6 +21,8 @@ import java.util.function.BiFunction;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import static java.util.function.Function.identity;
+
 /**
  * <p>A factory class used to create streams from other streams. There are currently six ways of rearranging streams
  * using more-spliterators.
@@ -41,6 +43,22 @@ import java.util.stream.StreamSupport;
  * @since 0.1
  */
 public class MoreSpliterators {
+
+    /**
+     * <p>Generates a stream by repeating the elements of the provided stream forever. This stream is not bounded. </p>
+     * <pre>{@code
+     *     Stream<String> stream = Stream.of("tick", "tock");
+     *     Stream<String> cyclingStream = MoreSpliterator.cyce(stream);
+     *     List<String> collect = cyclingStream.limit(9).collect(Collectors.toList());
+     *     // The collect list is ["tick", "tock", "tick", "tock", "tick", "tock", "tick", "tock", "tick"]
+     * }</pre>
+     * @param stream The stream to cycle on. Will throw a <code>NullPointerException</code> if <code>null</code>.
+     * @return
+     */
+    public static <E> Stream<E> cycle(Stream<E> stream) {
+        CyclingSpliterator<E> spliterator = CyclingSpliterator.of(stream.spliterator());
+        return StreamSupport.stream(spliterator, false).flatMap(identity());
+    }
 
     /**
      * <p>Generates a stream by regrouping the elements of the provided stream and putting them in a substream. The number
@@ -69,7 +87,7 @@ public class MoreSpliterators {
      * <pre>{@code
      *     Stream<String> stream = Stream.of("a0", "a1", "a2", "a3");
      *     Stream<String> repeatingStream = MoreSpliterators.repeat(stream, 3);
-     *     List<String> collect = repeatingStream.map(st -> st.collect(Collectors.toList());
+     *     List<String> collect = repeatingStream.collect(Collectors.toList());
      *     // The collect list is ["a0", "a0", "a0", "a1", "a1", "a1", "a2", "a2", "a2", "a3", "a3", "a3"]
      * }</pre>
      * <p>If the provided stream is empty, then the returned stream is also empty.</p>
@@ -140,7 +158,7 @@ public class MoreSpliterators {
      *     Stream<String> stream1 = Stream.of("a10", "a11", "a12");
      *     Stream<String> stream2 = Stream.of("a20", "a21", "a22");
      *     Stream<Stream<String>> weavingStream = MoreSpliterators.traverse(stream0, stream1, stream2);
-     *     List<String> collect = weavingStream.map(st -> st.collect(Collectors.toList());
+     *     List<String> collect = weavingStream.map(st -> st.collect(Collectors.toList()).collect(Collectors.toList());
      *     // The collect list is ["a00", "a10", "a20", "a01", "a11", "a21", "a02", "a12", "a22"]
      * }</pre>
      * @param streams The streams to be weaved. Will throw a <code>NullPointerException</code> if <code>null</code>.
@@ -161,7 +179,7 @@ public class MoreSpliterators {
      *     Stream<Integer> stream1 = Stream.of(0, 1, 2, 3);
      *     Bifunction<String, Integer, String> zipper = (s, i) -> s + "-" + i;
      *     Stream<String> zippingStream = MoreSpliterators.zip(stream0, stream1, zipper);
-     *     List<String> collect = zippingStream.map(st -> st.collect(Collectors.toList());
+     *     List<String> collect = zippingStream.collect(Collectors.toList());
      *     // The collect list is ["a-0", "b-1", "c-2", "d-3"]
      * }</pre>
      * @param stream1 The first stream to be zipped. Will throw a <code>NullPointerException</code> if <code>null</code>.
