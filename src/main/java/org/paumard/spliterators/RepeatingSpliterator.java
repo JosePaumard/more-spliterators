@@ -56,7 +56,7 @@ public class RepeatingSpliterator<E> implements Spliterator<E> {
 
     @Override
     public Spliterator<E> trySplit() {
-        return RepeatingSpliterator.of(this.spliterator.trySplit(), repeating);
+        return new RepeatingSpliterator<>(this.spliterator.trySplit(), repeating);
     }
 
     @Override

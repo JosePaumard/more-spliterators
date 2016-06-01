@@ -23,6 +23,7 @@ import java.util.Deque;
 import java.util.Objects;
 import java.util.Spliterator;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 /**
  * @author José
@@ -83,21 +84,12 @@ public class WeavingSpliterator<E> implements Spliterator<E> {
     @SuppressWarnings("unchecked")
     @Override
     public Spliterator<E> trySplit() {
-        Spliterator<E>[] spliterators = new Spliterator[this.spliterators.length];
-        int index = 0;
-        for (Spliterator<E> spliterator : this.spliterators) {
-            spliterators[index++] = spliterator.trySplit();
-        }
-        return new WeavingSpliterator<>(spliterators);
+        return new WeavingSpliterator<>(Stream.of(spliterators).map(Spliterator::trySplit).toArray(WeavingSpliterator[]::new));
     }
 
     @Override
     public long estimateSize() {
-        int size = 0;
-        for (Spliterator<E> spliterator : this.spliterators) {
-            size += spliterator.estimateSize();
-        }
-        return size;
+        return Stream.of(spliterators).mapToLong(Spliterator::estimateSize).sum();
     }
 
     @Override

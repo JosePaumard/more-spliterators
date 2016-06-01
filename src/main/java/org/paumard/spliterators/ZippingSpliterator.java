@@ -29,13 +29,13 @@ public class ZippingSpliterator<E1, E2, R> implements Spliterator<R> {
 
 	private final Spliterator<E1> spliterator1 ;
 	private final Spliterator<E2> spliterator2 ;
-	private final BiFunction<E1, E2, R> tranform ;
+	private final BiFunction<? super E1, ? super E2, ? extends R> zipper;
 
 	public static class Builder<E1, E2, R> {
 		
 		private Spliterator<E1> spliterator1;
 		private Spliterator<E2> spliterator2;
-		private BiFunction<E1, E2, R> tranform ;
+		private BiFunction<? super E1, ? super E2, ? extends R> zipper;
 		
 		public Builder() {
 		}
@@ -50,25 +50,25 @@ public class ZippingSpliterator<E1, E2, R> implements Spliterator<R> {
 			return this;
 		}
 		
-		public Builder<E1, E2, R> mergedBy(BiFunction<E1, E2, R> tranform) {
-			this.tranform = Objects.requireNonNull(tranform);
+		public Builder<E1, E2, R> mergedBy(BiFunction<? super E1, ? super E2, ? extends R> zipper) {
+			this.zipper = Objects.requireNonNull(zipper);
 			return this;
 		}
 		
 		public ZippingSpliterator<E1, E2, R> build() {
 			Objects.requireNonNull(spliterator1);
 			Objects.requireNonNull(spliterator2);
-			Objects.requireNonNull(tranform);
-			return new ZippingSpliterator<>(spliterator1, spliterator2, tranform);
+			Objects.requireNonNull(zipper);
+			return new ZippingSpliterator<>(spliterator1, spliterator2, zipper);
 		}
 	}
 	
 	private ZippingSpliterator(
-			Spliterator<E1> spliterator1, Spliterator<E2> spliterator2, 
-			BiFunction<E1, E2, R> tranform) {
+			Spliterator<E1> spliterator1, Spliterator<E2> spliterator2,
+			BiFunction<? super E1, ? super E2, ? extends R> tranform) {
 		this.spliterator1 = spliterator1 ;
 		this.spliterator2 = spliterator2 ;
-		this.tranform = tranform ;
+		this.zipper = tranform ;
 	}
 	
 	@Override
@@ -76,7 +76,7 @@ public class ZippingSpliterator<E1, E2, R> implements Spliterator<R> {
 		return spliterator1.tryAdvance(
 				e1 -> {
 					spliterator2.tryAdvance(e2 -> {
-						action.accept(tranform.apply(e1, e2)) ;
+						action.accept(zipper.apply(e1, e2)) ;
 					}) ;
 				}
 			) ;
@@ -86,7 +86,7 @@ public class ZippingSpliterator<E1, E2, R> implements Spliterator<R> {
 	public Spliterator<R> trySplit() {
 		Spliterator<E1> splitedSpliterator1 = spliterator1.trySplit() ;
 		Spliterator<E2> splitedSpliterator2 = spliterator2.trySplit() ;
-		return new ZippingSpliterator<>(splitedSpliterator1, splitedSpliterator2, tranform) ;
+		return new ZippingSpliterator<>(splitedSpliterator1, splitedSpliterator2, zipper) ;
 	}
 
 	@Override

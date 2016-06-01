@@ -66,7 +66,7 @@ public class TraversingSpliterator<E> implements Spliterator<Stream<E>> {
     public Spliterator<Stream<E>> trySplit() {
         TraversingSpliterator<E>[] spliterators =
                 Stream.of(this.spliterators).map(Spliterator::trySplit).toArray(TraversingSpliterator[]::new);
-        return TraversingSpliterator.of((Spliterator<E>[]) spliterators);
+        return new TraversingSpliterator<>((Spliterator<E>[]) spliterators);
     }
 
     @Override
