@@ -16,6 +16,8 @@
 
 package org.paumard.spliterators;
 
+import org.paumard.spliterators.exception.WhyWouldYouDoThatException;
+
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Objects;
@@ -36,7 +38,7 @@ public class WeavingSpliterator<E> implements Spliterator<E> {
     public static <E> WeavingSpliterator<E> of(Spliterator<E>... spliterators) {
         Objects.requireNonNull(spliterators);
         if (spliterators.length < 2)
-            throw new IllegalArgumentException("Cannot weave less than 2 spliterators");
+            throw new WhyWouldYouDoThatException("Why would you weave less than 2 spliterators?");
 
         return new WeavingSpliterator<>(spliterators);
     }

@@ -16,6 +16,7 @@
 
 package org.paumard.spliterators;
 
+import org.paumard.spliterators.exception.WhyWouldYouDoThatException;
 import org.testng.annotations.Test;
 
 import java.util.Arrays;
@@ -83,7 +84,7 @@ public class WeavingSpliteratorTest {
         WeavingSpliterator<String> groupingSpliterator = WeavingSpliterator.of(null);
     }
 
-    @Test(expectedExceptions = IllegalArgumentException.class)
+    @Test(expectedExceptions = WhyWouldYouDoThatException.class)
     public void should_not_build_a_weaving_spliterator_on_less_than_two_spliterators() {
         // Given
         Stream<String> strings = Stream.of("1", "2", "3", "4", "5", "6", "7");

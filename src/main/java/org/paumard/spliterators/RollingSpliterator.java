@@ -16,6 +16,8 @@
 
 package org.paumard.spliterators;
 
+import org.paumard.spliterators.exception.WhyWouldYouDoThatException;
+
 import java.util.Objects;
 import java.util.Spliterator;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -37,7 +39,7 @@ public class RollingSpliterator<E> implements Spliterator<Stream<E>> {
 	public static <E> RollingSpliterator<E> of(Spliterator<E> spliterator, int grouping) {
 		Objects.requireNonNull(spliterator);
 		if (grouping < 2)
-			throw new IllegalArgumentException("Grouping factor should be greater than 2");
+			throw new WhyWouldYouDoThatException("Why would you be creating a rolling spliterator with a grouping factor of less than 2?");
 
 		return new RollingSpliterator<>(spliterator, grouping);
 	}
