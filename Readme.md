@@ -63,3 +63,22 @@ The resulting stream is the following:
 ## Zipping
 
 The zipping operator takes two streams and a bifunction. The resulting stream is the application of the bifunction on two elements of the streams, one at a time. 
+
+## Acknowledgements
+
+Many thanks to Rémi Forax for his valuable advice during the development of this API. 
+
+Now Rémi you can implement `FizzBuzz` using the following code:
+```
+Stream<String> fizzBuzz = 
+   zip(
+      IntStream.range(0, 101).boxed(), 
+      zip(
+         cycle(Stream.of("fizz", "", "")), 
+         cycle(Stream.of("buzz, "", "", "", ""))
+         String::concat
+      ), 
+      (string, i) -> string.isEmpty() ? i.toString() : string
+   );
+fizzBuzz.skip(1).forEach(System.out::println);
+```
