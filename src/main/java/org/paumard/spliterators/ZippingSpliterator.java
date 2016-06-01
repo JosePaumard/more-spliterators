@@ -22,80 +22,81 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 /**
- *
  * @author José
  */
 public class ZippingSpliterator<E1, E2, R> implements Spliterator<R> {
 
-	private final Spliterator<E1> spliterator1 ;
-	private final Spliterator<E2> spliterator2 ;
-	private final BiFunction<? super E1, ? super E2, ? extends R> zipper;
+    private final Spliterator<E1> spliterator1;
+    private final Spliterator<E2> spliterator2;
+    private final BiFunction<? super E1, ? super E2, ? extends R> zipper;
 
-	public static class Builder<E1, E2, R> {
-		
-		private Spliterator<E1> spliterator1;
-		private Spliterator<E2> spliterator2;
-		private BiFunction<? super E1, ? super E2, ? extends R> zipper;
-		
-		public Builder() {
-		}
-		
-		public Builder<E1, E2, R> with(Spliterator<E1> spliterator) {
-			this.spliterator1 = Objects.requireNonNull(spliterator);
-			return this;
-		}
-		
-		public Builder<E1, E2, R> and(Spliterator<E2> spliterator) {
-			this.spliterator2 = Objects.requireNonNull(spliterator);
-			return this;
-		}
-		
-		public Builder<E1, E2, R> mergedBy(BiFunction<? super E1, ? super E2, ? extends R> zipper) {
-			this.zipper = Objects.requireNonNull(zipper);
-			return this;
-		}
-		
-		public ZippingSpliterator<E1, E2, R> build() {
-			Objects.requireNonNull(spliterator1);
-			Objects.requireNonNull(spliterator2);
-			Objects.requireNonNull(zipper);
-			return new ZippingSpliterator<>(spliterator1, spliterator2, zipper);
-		}
-	}
-	
-	private ZippingSpliterator(
-			Spliterator<E1> spliterator1, Spliterator<E2> spliterator2,
-			BiFunction<? super E1, ? super E2, ? extends R> tranform) {
-		this.spliterator1 = spliterator1 ;
-		this.spliterator2 = spliterator2 ;
-		this.zipper = tranform ;
-	}
-	
-	@Override
-	public boolean tryAdvance(Consumer<? super R> action) {
-		return spliterator1.tryAdvance(
-				e1 -> {
-					spliterator2.tryAdvance(e2 -> {
-						action.accept(zipper.apply(e1, e2)) ;
-					}) ;
-				}
-			) ;
-	}
+    public static class Builder<E1, E2, R> {
 
-	@Override
-	public Spliterator<R> trySplit() {
-		Spliterator<E1> splitedSpliterator1 = spliterator1.trySplit() ;
-		Spliterator<E2> splitedSpliterator2 = spliterator2.trySplit() ;
-		return new ZippingSpliterator<>(splitedSpliterator1, splitedSpliterator2, zipper) ;
-	}
+        private Spliterator<E1> spliterator1;
+        private Spliterator<E2> spliterator2;
+        private BiFunction<? super E1, ? super E2, ? extends R> zipper;
 
-	@Override
-	public long estimateSize() {
-		return this.spliterator1.estimateSize() ;
-	}
+        public Builder() {
+        }
 
-	@Override
-	public int characteristics() {
-		return this.spliterator1.characteristics() ;
-	}
+        public Builder<E1, E2, R> with(Spliterator<E1> spliterator) {
+            this.spliterator1 = Objects.requireNonNull(spliterator);
+            return this;
+        }
+
+        public Builder<E1, E2, R> and(Spliterator<E2> spliterator) {
+            this.spliterator2 = Objects.requireNonNull(spliterator);
+            return this;
+        }
+
+        public Builder<E1, E2, R> mergedBy(BiFunction<? super E1, ? super E2, ? extends R> zipper) {
+            this.zipper = Objects.requireNonNull(zipper);
+            return this;
+        }
+
+        public ZippingSpliterator<E1, E2, R> build() {
+            Objects.requireNonNull(spliterator1);
+            Objects.requireNonNull(spliterator2);
+            Objects.requireNonNull(zipper);
+            return new ZippingSpliterator<>(spliterator1, spliterator2, zipper);
+        }
+    }
+
+    private ZippingSpliterator(
+            Spliterator<E1> spliterator1, Spliterator<E2> spliterator2,
+            BiFunction<? super E1, ? super E2, ? extends R> tranform) {
+        this.spliterator1 = spliterator1;
+        this.spliterator2 = spliterator2;
+        this.zipper = tranform;
+    }
+
+    @Override
+    public boolean tryAdvance(Consumer<? super R> action) {
+        return spliterator1.tryAdvance(
+                e1 -> {
+                    spliterator2.tryAdvance(e2 -> {
+                        action.accept(zipper.apply(e1, e2));
+                    });
+                }
+        );
+    }
+
+    @Override
+    public Spliterator<R> trySplit() {
+        Spliterator<E1> splitedSpliterator1 = spliterator1.trySplit();
+        Spliterator<E2> splitedSpliterator2 = spliterator2.trySplit();
+
+        return splitedSpliterator1 == null || splitedSpliterator2 == null ? null :
+                new ZippingSpliterator<>(splitedSpliterator1, splitedSpliterator2, zipper);
+    }
+
+    @Override
+    public long estimateSize() {
+        return Long.min(spliterator1.estimateSize(), spliterator2.estimateSize());
+    }
+
+    @Override
+    public int characteristics() {
+        return this.spliterator1.characteristics() & this.spliterator2.characteristics();
+    }
 }

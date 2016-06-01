@@ -25,6 +25,8 @@ import java.util.Spliterator;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.toList;
+
 /**
  * @author José
  */
@@ -38,8 +40,12 @@ public class WeavingSpliterator<E> implements Spliterator<E> {
 
     public static <E> WeavingSpliterator<E> of(Spliterator<E>... spliterators) {
         Objects.requireNonNull(spliterators);
-        if (spliterators.length < 2)
+        if (spliterators.length < 2) {
             throw new WhyWouldYouDoThatException("Why would you weave less than 2 spliterators?");
+        }
+        if (Stream.of(spliterators).mapToInt(Spliterator::characteristics).reduce(Spliterator.ORDERED, (i1, i2) -> i1 & i2) == 0) {
+            throw new WhyWouldYouDoThatException("Why would you want to traverse non ordered spliterators?");
+        }
 
         return new WeavingSpliterator<>(spliterators);
     }
@@ -84,16 +90,26 @@ public class WeavingSpliterator<E> implements Spliterator<E> {
     @SuppressWarnings("unchecked")
     @Override
     public Spliterator<E> trySplit() {
-        return new WeavingSpliterator<>(Stream.of(spliterators).map(Spliterator::trySplit).toArray(WeavingSpliterator[]::new));
+        WeavingSpliterator[] splitSpliterators = Stream.of(spliterators).map(Spliterator::trySplit).toArray(WeavingSpliterator[]::new);
+        return Stream.of(splitSpliterators).noneMatch(Objects::isNull) ? new WeavingSpliterator<>(splitSpliterators) : null;
     }
 
     @Override
     public long estimateSize() {
-        return Stream.of(spliterators).mapToLong(Spliterator::estimateSize).sum();
+        return (hasMaxValueSize() || hasSumOverflowed()) ? Long.MAX_VALUE : Stream.of(spliterators).mapToLong(Spliterator::estimateSize).sum();
+    }
+
+    private boolean hasSumOverflowed() {
+        Stream<Stream<Long>> rolledStream = MoreSpliterators.roll(Stream.of(spliterators).map(Spliterator::estimateSize), 2);
+        return rolledStream.map(stream -> stream.collect(toList())).allMatch(list -> list.get(0) < list.get(1));
+    }
+
+    private boolean hasMaxValueSize() {
+        return Stream.of(spliterators).mapToLong(Spliterator::estimateSize).anyMatch(l -> l == Long.MAX_VALUE);
     }
 
     @Override
     public int characteristics() {
-        return this.spliterators[0].characteristics();
+        return Stream.of(spliterators).mapToInt(Spliterator::characteristics).reduce(0xFFFFFFFF, (i1, i2) -> i1 & i2);
     }
 }

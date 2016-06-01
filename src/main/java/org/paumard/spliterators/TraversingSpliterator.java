@@ -34,8 +34,12 @@ public class TraversingSpliterator<E> implements Spliterator<Stream<E>> {
 
     public static <E> TraversingSpliterator<E> of(Spliterator<E>... spliterators) {
         Objects.requireNonNull(spliterators);
-        if (spliterators.length < 2)
+        if (spliterators.length < 2) {
             throw new WhyWouldYouDoThatException("Why would you want to traverse less than two streams?");
+        }
+        if (Stream.of(spliterators).mapToInt(Spliterator::characteristics).reduce(Spliterator.ORDERED, (i1, i2) -> i1 & i2) == 0) {
+            throw new WhyWouldYouDoThatException("Why would you want to traverse non ordered spliterators?");
+        }
 
         return new TraversingSpliterator<>(spliterators);
     }
@@ -71,12 +75,11 @@ public class TraversingSpliterator<E> implements Spliterator<Stream<E>> {
 
     @Override
     public long estimateSize() {
-        return spliterators[0].estimateSize();
+        return Stream.of(spliterators).mapToLong(Spliterator::estimateSize).min().getAsLong();
     }
 
     @Override
     public int characteristics() {
-        return spliterators[0].characteristics();
+        return Stream.of(spliterators).mapToInt(Spliterator::characteristics).reduce(0xFFFFFFFF, (i1, i2) -> i1 & i2);
     }
-
 }

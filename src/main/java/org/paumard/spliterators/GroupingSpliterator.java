@@ -37,6 +37,9 @@ public class GroupingSpliterator<E> implements Spliterator<Stream<E>> {
         Objects.requireNonNull(spliterator);
         if (grouping < 2)
             throw new WhyWouldYouDoThatException("Why would you build a grouping spliterator with a grouping factor of less than 2?");
+        if ((spliterator.characteristics() & Spliterator.ORDERED) == 0) {
+            throw new WhyWouldYouDoThatException("Why would you build a grouping spliterator on a non-ordered spliterator?");
+        }
 
         return new GroupingSpliterator<>(spliterator, grouping);
     }
@@ -74,16 +77,19 @@ public class GroupingSpliterator<E> implements Spliterator<Stream<E>> {
 
     @Override
     public Spliterator<Stream<E>> trySplit() {
-        return new GroupingSpliterator<>(this.spliterator.trySplit(), grouping);
+        Spliterator<E> splitSpliterator = this.spliterator.trySplit();
+        return splitSpliterator == null ? null : new GroupingSpliterator<>(splitSpliterator, grouping);
     }
 
     @Override
     public long estimateSize() {
-        return spliterator.estimateSize() / grouping;
+        long estimateSize = spliterator.estimateSize();
+        return estimateSize == Long.MAX_VALUE ? Long.MAX_VALUE : estimateSize / grouping;
     }
 
     @Override
     public int characteristics() {
+        // this spliterator is already ordered
         return spliterator.characteristics();
     }
 }

@@ -56,16 +56,18 @@ public class RepeatingSpliterator<E> implements Spliterator<E> {
 
     @Override
     public Spliterator<E> trySplit() {
-        return new RepeatingSpliterator<>(this.spliterator.trySplit(), repeating);
+        Spliterator<E> splitSpliterator = spliterator.trySplit();
+        return splitSpliterator == null ? null : new RepeatingSpliterator<>(splitSpliterator, repeating);
     }
 
     @Override
     public long estimateSize() {
-        return this.spliterator.estimateSize() * repeating;
+        long estimateSize = spliterator.estimateSize();
+        return (estimateSize == Long.MAX_VALUE) || (estimateSize*repeating < estimateSize) ? Long.MAX_VALUE : estimateSize*repeating;
     }
 
     @Override
     public int characteristics() {
-        return this.spliterator.characteristics();
+        return this.spliterator.characteristics() | Spliterator.ORDERED;
     }
 }

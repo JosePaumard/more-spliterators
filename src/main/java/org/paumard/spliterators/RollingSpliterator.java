@@ -38,8 +38,12 @@ public class RollingSpliterator<E> implements Spliterator<Stream<E>> {
 
 	public static <E> RollingSpliterator<E> of(Spliterator<E> spliterator, int grouping) {
 		Objects.requireNonNull(spliterator);
-		if (grouping < 2)
-			throw new WhyWouldYouDoThatException("Why would you be creating a rolling spliterator with a grouping factor of less than 2?");
+		if (grouping < 2) {
+            throw new WhyWouldYouDoThatException("Why would you be creating a rolling spliterator with a grouping factor of less than 2?");
+        }
+        if ((spliterator.characteristics() & Spliterator.ORDERED) == 0) {
+            throw new WhyWouldYouDoThatException("Why would you create a rolling spliterator on a non-ordered spliterator?");
+        }
 
 		return new RollingSpliterator<>(spliterator, grouping);
 	}
@@ -80,7 +84,8 @@ public class RollingSpliterator<E> implements Spliterator<Stream<E>> {
 
 	@Override
 	public Spliterator<Stream<E>> trySplit() {
-		return new RollingSpliterator<>(spliterator.trySplit(), grouping) ;
+		Spliterator<E> splitSpliterator = spliterator.trySplit();
+		return splitSpliterator == null ? null : new RollingSpliterator<>(splitSpliterator, grouping) ;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -96,11 +101,13 @@ public class RollingSpliterator<E> implements Spliterator<Stream<E>> {
 
 	@Override
 	public long estimateSize() {
-		return spliterator.estimateSize() - grouping ;
+		long estimateSize = spliterator.estimateSize();
+		return estimateSize == Long.MAX_VALUE ? Long.MAX_VALUE : estimateSize - grouping;
 	}
 
 	@Override
 	public int characteristics() {
-		return spliterator.characteristics() ;
+        // this spliterator is already ordered
+		return spliterator.characteristics();
 	}
 }
