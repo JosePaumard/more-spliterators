@@ -54,7 +54,8 @@ public class MoreSpliterators {
      * }</pre>
      * <p>The returned spliterator is <code>ORDERED</code>.</p>
      * @param stream The stream to cycle on. Will throw a <code>NullPointerException</code> if <code>null</code>.
-     * @return
+     * @param <E> The type of the elements of the provided stream.
+     * @return A cycling stream.
      */
     public static <E> Stream<E> cycle(Stream<E> stream) {
         CyclingSpliterator<E> spliterator = CyclingSpliterator.of(stream.spliterator());
@@ -81,7 +82,8 @@ public class MoreSpliterators {
      * elements from the provided stream that will not be consumed in the grouped stream. </p>
      * @param stream The stream to be grouped. Will throw a <code>NullPointerException</code> if <code>null</code>.
      * @param groupingFactor The grouping factor, should be greater of equal than 2.
-     * @return
+     * @param <E> The type of the elements of the provided stream.
+     * @return A grouped stream of streams.
      */
     public static <E> Stream<Stream<E>> group(Stream<E> stream, int groupingFactor) {
         GroupingSpliterator<E> spliterator = GroupingSpliterator.of(stream.spliterator(), groupingFactor);
@@ -109,7 +111,8 @@ public class MoreSpliterators {
      * <p>The returned stream is <code>ORDERED</code>.</p>
      * @param stream The stream to be repeated. Will throw a <code>NullPointerException</code> if <code>null</code>.
      * @param repeatingFactor The repeating factor, should be greater of equal than 2.
-     * @return
+     * @param <E> The type of the elements of the provided stream.
+     * @return A repeating stream.
      */
     public static <E> Stream<E> repeat(Stream<E> stream, int repeatingFactor) {
         RepeatingSpliterator<E> spliterator = RepeatingSpliterator.of(stream.spliterator(), repeatingFactor);
@@ -142,7 +145,8 @@ public class MoreSpliterators {
      * elements from the provided stream that will not be consumed in the grouped stream. </p>
      * @param stream The stream to be rolled. Will throw a <code>NullPointerException</code> if <code>null</code>.
      * @param rollingFactor The rolling factor, should be greater of equal than 2.
-     * @return
+     * @param <E> The type of the elements of the provided stream.
+     * @return A rolling stream of streams.
      */
     public static <E> Stream<Stream<E>> roll(Stream<E> stream, int rollingFactor) {
         RollingSpliterator<E> spliterator = RollingSpliterator.of(stream.spliterator(), rollingFactor);
@@ -171,7 +175,8 @@ public class MoreSpliterators {
      * the provided streams. In most of the cases, all these streams will share the same characteristics, so in this
      * case it will be the same as well. The returned stream is thus <code>ORDERED</code>.</p>
      * @param streams The streams to be traversed. Will throw a <code>NullPointerException</code> if <code>null</code>.
-     * @return
+     * @param <E> The type of the elements of the provided stream.
+     * @return A traversing stream of streams.
      */
     public static <E> Stream<Stream<E>> traverse(Stream<E>... streams) {
         Spliterator[] spliterators = Stream.of(streams).map(Stream::spliterator).toArray(Spliterator[]::new);
@@ -200,7 +205,8 @@ public class MoreSpliterators {
      * <p>The returned stream will stop producing elements as soon as one of the provided stream stops to do so.
      * So some of the elements of the provided streams might not be consumed. </p>
      * @param streams The streams to be weaved. Will throw a <code>NullPointerException</code> if <code>null</code>.
-     * @return
+     * @param <E> The type of the elements of the provided stream.
+     * @return A weaved stream.
      */
     public static <E> Stream<E> weave(Stream<E>... streams) {
         Spliterator[] spliterators = Stream.of(streams).map(Stream::spliterator).toArray(Spliterator[]::new);
@@ -235,7 +241,10 @@ public class MoreSpliterators {
      * @param stream2 The second stream to be zipped. Will throw a <code>NullPointerException</code> if <code>null</code>.
      * @param zipper The bifunction used to transform the elements of the two streams.
      *               Will throw a <code>NullPointerException</code> if <code>null</code>.
-     * @return
+     * @param <E1> The type of the elements of the first provided stream.
+     * @param <E2> The type of the elements of the second provided stream.
+     * @param <R> The type of the elements of the returned stream.
+     * @return A zipped stream.
      */
     public static <E1, E2, R> Stream<R> zip(Stream<E1> stream1, Stream<E2> stream2, BiFunction<E1, E2, R> zipper) {
         ZippingSpliterator.Builder builder = new ZippingSpliterator.Builder();
