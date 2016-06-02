@@ -28,6 +28,8 @@ import java.util.stream.Stream;
 import static java.util.stream.Collectors.toList;
 
 /**
+ * See the documentation and patterns to be used in this class in the {@link MoreSpliterators} factory class.
+ *
  * @author José
  */
 public class WeavingSpliterator<E> implements Spliterator<E> {

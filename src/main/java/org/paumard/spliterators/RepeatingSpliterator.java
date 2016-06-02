@@ -24,6 +24,8 @@ import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
 /**
+ * See the documentation and patterns to be used in this class in the {@link MoreSpliterators} factory class.
+ *
  * Created by José
  */
 public class RepeatingSpliterator<E> implements Spliterator<E> {

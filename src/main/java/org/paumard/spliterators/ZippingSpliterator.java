@@ -22,6 +22,8 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 /**
+ * See the documentation and patterns to be used in this class in the {@link MoreSpliterators} factory class.
+ *
  * @author José
  */
 public class ZippingSpliterator<E1, E2, R> implements Spliterator<R> {

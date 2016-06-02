@@ -24,6 +24,8 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 /**
+ * See the documentation and patterns to be used in this class in the {@link MoreSpliterators} factory class.
+ *
  * @author José
  */
 public class GroupingSpliterator<E> implements Spliterator<Stream<E>> {
