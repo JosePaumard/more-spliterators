@@ -63,6 +63,6 @@ public class CyclingSpliterator<E> implements Spliterator<Stream<E>> {
 
     @Override
     public int characteristics() {
-        return Spliterator.NONNULL;
+        return Spliterator.ORDERED;
     }
 }

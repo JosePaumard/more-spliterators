@@ -66,10 +66,10 @@ public class ZippingSpliterator<E1, E2, R> implements Spliterator<R> {
 
     private ZippingSpliterator(
             Spliterator<E1> spliterator1, Spliterator<E2> spliterator2,
-            BiFunction<? super E1, ? super E2, ? extends R> tranform) {
+            BiFunction<? super E1, ? super E2, ? extends R> zipper) {
         this.spliterator1 = spliterator1;
         this.spliterator2 = spliterator2;
-        this.zipper = tranform;
+        this.zipper = zipper;
     }
 
     @Override
@@ -77,7 +77,7 @@ public class ZippingSpliterator<E1, E2, R> implements Spliterator<R> {
         return spliterator1.tryAdvance(
                 e1 -> {
                     spliterator2.tryAdvance(e2 -> {
-                        action.accept(zipper.apply(e1, e2));
+                        action.accept(Objects.requireNonNull(zipper.apply(e1, e2)));
                     });
                 }
         );

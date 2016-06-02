@@ -36,6 +36,9 @@ public class RepeatingSpliterator<E> implements Spliterator<E> {
         if (repeating <= 1) {
             throw new IllegalArgumentException (("Why would you build a repeating spliterator with a repeating factor of less than 2?"));
         }
+        if ((spliterator.characteristics() & Spliterator.SIZED) == 0) {
+            throw new IllegalArgumentException (("Why would you try to repeat a non-SIZED spliterator?"));
+        }
 
         return new RepeatingSpliterator<>(spliterator, repeating);
     }

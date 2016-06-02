@@ -24,7 +24,7 @@ import java.util.stream.StreamSupport;
 import static java.util.function.Function.identity;
 
 /**
- * <p>A factory class used to create streams from other streams. There are currently six ways of rearranging streams
+ * <p>A factory class used to create streams from other streams. There are currently seven ways of rearranging streams
  * using more-spliterators.
  * </p>
  *
@@ -52,6 +52,7 @@ public class MoreSpliterators {
      *     List<String> collect = cyclingStream.limit(9).collect(Collectors.toList());
      *     // The collect list is ["tick", "tock", "tick", "tock", "tick", "tock", "tick", "tock", "tick"]
      * }</pre>
+     * <p>The returned spliterator is <code>ORDERED</code>.</p>
      * @param stream The stream to cycle on. Will throw a <code>NullPointerException</code> if <code>null</code>.
      * @return
      */
@@ -71,6 +72,13 @@ public class MoreSpliterators {
      *     // The collect list is [["a0", "a1"]["a2", "a3"]]
      * }</pre>
      * <p>If the provided stream is empty, then the returned stream contains an empty stream.</p>
+     * <p>The <code>groupingFactor</code> should be greater of equals than 2. A grouping factor of 0 does not make
+     * sense. A grouping factor of 1 is in fact a mapping with a <code>Stream::of</code>. An
+     * <code>IllegalArgumentException</code> will be thrown if a non valid <code>groupingFactor</code> is provided.</p>
+     * <p>An <code>IllegalArgumentException</code> will also be thrown if the provided stream is not <code>ORDERED</code></p>
+     * <p>The returned stream has the same characteristics as the provided stream, and is thus <code>ORDERED</code>.</p>
+     * <p>All the returned substreams are guaranteed to produce <code>groupingFactor</code> elements. So there might be
+     * elements from the provided stream that will not be consumed in the grouped stream. </p>
      * @param stream The stream to be grouped. Will throw a <code>NullPointerException</code> if <code>null</code>.
      * @param groupingFactor The grouping factor, should be greater of equal than 2.
      * @return
@@ -91,6 +99,14 @@ public class MoreSpliterators {
      *     // The collect list is ["a0", "a0", "a0", "a1", "a1", "a1", "a2", "a2", "a2", "a3", "a3", "a3"]
      * }</pre>
      * <p>If the provided stream is empty, then the returned stream is also empty.</p>
+     * <p>The <code>repeatingFactor</code> should be greater of equals than 2. A repeating factor of 0 does not make
+     * sense. A repeating factor of 1 is in fact the identity operation. An
+     * <code>IllegalArgumentException</code> will be thrown if a non valid <code>repeatingFactor</code> is provided.</p>
+     * <p>An <code>IllegalArgumentException</code> will be thrown if a non <code>SIZED</code> stream is provided.
+     * Believe me, trying to repeat an infinite stream is not a good idea.</p>
+     * <p>The repeating of the provided stream should no lead to the producing of more than <code>Long.MAX_VALUE</code>.
+     * Weird effects will occur in that case. </p>
+     * <p>The returned stream is <code>ORDERED</code>.</p>
      * @param stream The stream to be repeated. Will throw a <code>NullPointerException</code> if <code>null</code>.
      * @param repeatingFactor The repeating factor, should be greater of equal than 2.
      * @return
@@ -116,6 +132,14 @@ public class MoreSpliterators {
      *                             ["a5", "a6", "a7"]]
      * }</pre>
      * <p>If the provided stream is empty, then the returned stream contains an empty stream.</p>
+     * <p>The <code>rollingFactor</code> should be greater of equals than 2. A rolling factor of 0 does not make
+     * sense. A rolling factor of 1 is in fact a mapping with a <code>Stream::of</code>. An
+     * <code>IllegalArgumentException</code> will be thrown if a non valid <code>rollingFactor</code> is provided.</p>
+     * <p>An <code>IllegalArgumentException</code> will also be thrown is a non <code>ORDERED</code> stream is
+     * provided.</p>
+     * <p>The returned stream has the same characteristics as the provided stream, and is thus <code>ORDERED</code>.</p>
+     * <p>All the returned substreams are guaranteed to produce <code>rollingFactor</code> elements. So there might be
+     * elements from the provided stream that will not be consumed in the grouped stream. </p>
      * @param stream The stream to be rolled. Will throw a <code>NullPointerException</code> if <code>null</code>.
      * @param rollingFactor The rolling factor, should be greater of equal than 2.
      * @return
@@ -140,6 +164,12 @@ public class MoreSpliterators {
      *                             ["a02", "a12", "a22", "a32"],
      *                             ["a03", "a13", "a23", "a33"]]
      * }</pre>
+     * <p>An <code>IllegalArgumentException</code> is thrown if there is only one stream provided in the varargs. In
+     * that casse, the traversing would be a mapping with <code>Stream::of</code>.</p>
+     * <p>An <code>IllegalArgumentException</code> is also thrown if one of the provided streams is not <code>ORDERED</code>. </p>
+     * <p>The characteristics of the returned stream is the bitwise <code>AND</code> of all the characteristics of
+     * the provided streams. In most of the cases, all these streams will share the same characteristics, so in this
+     * case it will be the same as well. The returned stream is thus <code>ORDERED</code>.</p>
      * @param streams The streams to be traversed. Will throw a <code>NullPointerException</code> if <code>null</code>.
      * @return
      */
@@ -161,6 +191,14 @@ public class MoreSpliterators {
      *     List<String> collect = weavingStream.map(st -> st.collect(Collectors.toList()).collect(Collectors.toList());
      *     // The collect list is ["a00", "a10", "a20", "a01", "a11", "a21", "a02", "a12", "a22"]
      * }</pre>
+     * <p>An <code>IllegalArgumentException</code> is thrown if there is only one stream provided in the varargs. In
+     * that casse, the traversing would be a mapping with <code>Stream::of</code>.</p>
+     * <p>An <code>IllegalArgumentException</code> is also thrown if one of the provided streams is not <code>ORDERED</code>. </p>
+     * <p>The characteristics of the returned stream is the bitwise <code>AND</code> of all the characteristics of
+     * the provided streams. In most of the cases, all these streams will share the same characteristics, so in this
+     * case it will be the same as well. The returned stream is thus <code>ORDERED</code>.</p>
+     * <p>The returned stream will stop producing elements as soon as one of the provided stream stops to do so.
+     * So some of the elements of the provided streams might not be consumed. </p>
      * @param streams The streams to be weaved. Will throw a <code>NullPointerException</code> if <code>null</code>.
      * @return
      */
@@ -182,6 +220,17 @@ public class MoreSpliterators {
      *     List<String> collect = zippingStream.collect(Collectors.toList());
      *     // The collect list is ["a-0", "b-1", "c-2", "d-3"]
      * }</pre>
+     * <p>The characteristics of the returned spliterator is the bitwise <code>AND</code> of the characteristics of
+     * the provided streams. Those streams should have the same characteristics, so there will be no change on
+     * this point. </p>
+     * <p>The returned stream will stop producing elements as soon as one of the provided stream stops to do so.
+     * So some of the elements of the provided streams might not be consumed. </p>
+     * <p>A <code>NullPointerException</code> will be thrown if the <code>zipper</code> generates a null value. So
+     * the returned stream is guaranteed not to have null values.</p>
+     * <p>In case you cannot be sure that your zipper returns <code>null</code>, then you can provide a
+     * <code>zipper</code> than wraps its result in an <code>Optional</code> (using the
+     * <code>Optional.ofNullable()</code> factory method), and flat map the returned stream. Your nulls will then
+     * be silently removed from the stream.</p>
      * @param stream1 The first stream to be zipped. Will throw a <code>NullPointerException</code> if <code>null</code>.
      * @param stream2 The second stream to be zipped. Will throw a <code>NullPointerException</code> if <code>null</code>.
      * @param zipper The bifunction used to transform the elements of the two streams.
