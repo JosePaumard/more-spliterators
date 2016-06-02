@@ -101,7 +101,7 @@ public class TraversingSpliteratorTest {
         TraversingSpliterator<String> spliterator = TraversingSpliterator.of(null);
     }
 
-    @Test(expectedExceptions = WhyWouldYouDoThatException.class)
+    @Test(expectedExceptions = IllegalArgumentException .class)
     public void should_not_build_a_transversal_spliterator_on_only_one_spliterator() {
         // Given
         Stream<String> streamA = Stream.of("a1", "a2");

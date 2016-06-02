@@ -67,7 +67,7 @@ public class RepeatingSpliteratorTest {
         RepeatingSpliterator<String> spliterator = RepeatingSpliterator.of(null, 3);
     }
 
-    @Test(expectedExceptions = WhyWouldYouDoThatException.class)
+    @Test(expectedExceptions = IllegalArgumentException .class)
     public void should_not_build_a_repeating_spliterator_with_a_repeating_factor_of_1() {
         // Given
         Stream<String> streamA = Stream.of("a1", "a2");

@@ -83,7 +83,7 @@ public class WeavingSpliteratorTest {
         WeavingSpliterator<String> groupingSpliterator = WeavingSpliterator.of(null);
     }
 
-    @Test(expectedExceptions = WhyWouldYouDoThatException.class)
+    @Test(expectedExceptions = IllegalArgumentException .class)
     public void should_not_build_a_weaving_spliterator_on_less_than_two_spliterators() {
         // Given
         Stream<String> strings = Stream.of("1", "2", "3", "4", "5", "6", "7");
