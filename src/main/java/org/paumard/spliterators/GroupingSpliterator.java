@@ -16,8 +16,6 @@
 
 package org.paumard.spliterators;
 
-import org.paumard.spliterators.exception.WhyWouldYouDoThatException;
-
 import java.util.Objects;
 import java.util.Spliterator;
 import java.util.function.Consumer;
@@ -38,9 +36,9 @@ public class GroupingSpliterator<E> implements Spliterator<Stream<E>> {
     public static <E> GroupingSpliterator<E> of(Spliterator<E> spliterator, long grouping) {
         Objects.requireNonNull(spliterator);
         if (grouping < 2)
-            throw new WhyWouldYouDoThatException("Why would you build a grouping spliterator with a grouping factor of less than 2?");
+            throw new IllegalArgumentException("Why would you build a grouping spliterator with a grouping factor of less than 2?");
         if ((spliterator.characteristics() & Spliterator.ORDERED) == 0) {
-            throw new WhyWouldYouDoThatException("Why would you build a grouping spliterator on a non-ordered spliterator?");
+            throw new IllegalArgumentException("Why would you build a grouping spliterator on a non-ordered spliterator?");
         }
 
         return new GroupingSpliterator<>(spliterator, grouping);

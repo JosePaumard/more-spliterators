@@ -16,7 +16,6 @@
 
 package org.paumard.spliterators;
 
-import org.paumard.spliterators.exception.WhyWouldYouDoThatException;
 import org.testng.annotations.Test;
 
 import java.util.List;

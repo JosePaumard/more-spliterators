@@ -16,8 +16,6 @@
 
 package org.paumard.spliterators;
 
-import org.paumard.spliterators.exception.WhyWouldYouDoThatException;
-
 import java.util.Objects;
 import java.util.Spliterator;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -37,10 +35,10 @@ public class TraversingSpliterator<E> implements Spliterator<Stream<E>> {
     public static <E> TraversingSpliterator<E> of(Spliterator<E>... spliterators) {
         Objects.requireNonNull(spliterators);
         if (spliterators.length < 2) {
-            throw new WhyWouldYouDoThatException("Why would you want to traverse less than two streams?");
+            throw new IllegalArgumentException ("Why would you want to traverse less than two streams?");
         }
         if (Stream.of(spliterators).mapToInt(Spliterator::characteristics).reduce(Spliterator.ORDERED, (i1, i2) -> i1 & i2) == 0) {
-            throw new WhyWouldYouDoThatException("Why would you want to traverse non ordered spliterators?");
+            throw new IllegalArgumentException ("Why would you want to traverse non ordered spliterators?");
         }
 
         return new TraversingSpliterator<>(spliterators);

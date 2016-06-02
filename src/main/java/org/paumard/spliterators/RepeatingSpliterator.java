@@ -16,8 +16,6 @@
 
 package org.paumard.spliterators;
 
-import org.paumard.spliterators.exception.WhyWouldYouDoThatException;
-
 import java.util.Objects;
 import java.util.Spliterator;
 import java.util.function.Consumer;
@@ -36,7 +34,7 @@ public class RepeatingSpliterator<E> implements Spliterator<E> {
     public static <E> RepeatingSpliterator<E> of(Spliterator<E> spliterator, int repeating) {
         Objects.requireNonNull(spliterator);
         if (repeating <= 1) {
-            throw new WhyWouldYouDoThatException(("Why would you build a repeating spliterator with a repeating factor of less than 2?"));
+            throw new IllegalArgumentException (("Why would you build a repeating spliterator with a repeating factor of less than 2?"));
         }
 
         return new RepeatingSpliterator<>(spliterator, repeating);
