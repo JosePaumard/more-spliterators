@@ -34,7 +34,8 @@ public class RollingSpliteratorTest {
     @Test
     public void should_roll_an_empty_stream_into_a_stream_of_an_empty_stream() {
         // Given
-        Stream<String> strings = Stream.empty();
+        // a trick to create an empty ORDERED stream
+        Stream<String> strings = Stream.of("one").filter(s -> s.isEmpty());
         int groupingFactor = 2;
 
         // When

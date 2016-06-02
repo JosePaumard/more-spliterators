@@ -34,8 +34,9 @@ public class WeavingSpliteratorTest {
     @Test
     public void should_weave_empty_streams_into_a_stream_of_an_empty_stream() {
         // Given
-        Stream<String> strings1 = Stream.empty();
-        Stream<String> strings2 = Stream.empty();
+        // a trick to create an empty ORDERED stream
+        Stream<String> strings1 = Stream.of("one").filter(s -> s.isEmpty());
+        Stream<String> strings2 = Stream.of("one").filter(s -> s.isEmpty());
 
         // When
         WeavingSpliterator<String> weavingSpliterator = WeavingSpliterator.of(strings1.spliterator(), strings2.spliterator());

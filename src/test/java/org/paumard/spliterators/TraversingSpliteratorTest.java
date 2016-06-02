@@ -34,8 +34,9 @@ public class TraversingSpliteratorTest {
     @Test
     public void should_a_return_stream_of_empty_stream_if_provided_streams_are_empty() {
         // Given
-        Stream<String> streamA = Stream.empty();
-        Stream<String> streamB = Stream.empty();
+        // a trick to create an empty ORDERED stream
+        Stream<String> streamA = Stream.of("one").filter(s -> s.isEmpty());
+        Stream<String> streamB = Stream.of("one").filter(s -> s.isEmpty());
 
         // When
         TraversingSpliterator<String> spliterator = TraversingSpliterator.of(streamA.spliterator(), streamB.spliterator());
@@ -65,8 +66,6 @@ public class TraversingSpliteratorTest {
                 stream.map(str -> str.collect(Collectors.toList()))
                         .collect(Collectors.toList());
 
-        System.out.println(strings);
-
         assertThat(strings.size()).isEqualTo(3);
         assertThat(strings.get(0)).asList().containsSequence("a1", "b1");
         assertThat(strings.get(1)).asList().containsSequence("a2", "b2");
@@ -87,8 +86,6 @@ public class TraversingSpliteratorTest {
         List<List<String>> strings =
                 stream.map(str -> str.collect(Collectors.toList()))
                         .collect(Collectors.toList());
-
-        System.out.println(strings);
 
         assertThat(strings.size()).isEqualTo(2);
         assertThat(strings.get(0)).asList().containsExactly("a1", "b1");
