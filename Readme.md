@@ -78,7 +78,7 @@ Stream<String> fizzBuzz =
          cycle(Stream.of("buzz, "", "", "", ""))
          String::concat
       ), 
-      (string, i) -> string.isEmpty() ? i.toString() : string
+      (i, string) -> string.isEmpty() ? i.toString() : string
    );
 fizzBuzz.skip(1).forEach(System.out::println);
 ```
