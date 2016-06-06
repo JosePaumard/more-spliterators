@@ -8,7 +8,7 @@ This problem can be solved by creating a spliterator on the original stream spli
 
 The entry point of this API is meant to be the `MoreSpliterators` factory class. Reading the Javadoc is a good ideas, patterns are provided.
 
-So far this API provides six operations
+So far this API provides seven operations
 
 ## Cycling
 
