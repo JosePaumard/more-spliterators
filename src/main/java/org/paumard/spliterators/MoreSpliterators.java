@@ -16,8 +16,12 @@
 
 package org.paumard.spliterators;
 
+import java.util.Objects;
 import java.util.Spliterator;
 import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -247,6 +251,8 @@ public class MoreSpliterators {
      * @return A zipped stream.
      */
     public static <E1, E2, R> Stream<R> zip(Stream<E1> stream1, Stream<E2> stream2, BiFunction<E1, E2, R> zipper) {
+        Objects.requireNonNull(stream1);
+        Objects.requireNonNull(stream2);
         ZippingSpliterator.Builder builder = new ZippingSpliterator.Builder();
         ZippingSpliterator<E1, E2, R> spliterator =
         builder.with(stream1.spliterator())
@@ -254,5 +260,48 @@ public class MoreSpliterators {
                 .mergedBy(zipper)
                 .build();
         return StreamSupport.stream(spliterator, false);
+    }
+
+    /**
+     * <p>Generates a stream by validating the elements of an input stream one by one using the provided predicate. </p>
+     * <p>An element of the input stream is said to be valid if the provided predicate returns true for this element.</p>
+     * <p>A valid element is replaced in the returned stream by the application of the provided function for valid
+     * elements. A non-valid element is replaced by the other function. </p>
+     * <p>A <code>NullPointerException</code> will be thrown if one of the provided elements is null. </p>
+     * @param stream the stream to be validated.
+     * @param validator the predicate used to validate the elements of the stream.
+     * @param transformingIfValid the function applied to the valid elements.
+     * @param transformingIfNotValid the function applied to the non-valid elements.
+     * @param <E> the type of the elements of the input stream.
+     * @param <R> the type of the elements of the returned stream.
+     * @return the validated and transformed stream.
+     */
+    public static <E, R> Stream<R> validate(Stream<E> stream, Predicate<E> validator,
+                                            Function<E, R> transformingIfValid, Function<E, R> transformingIfNotValid) {
+        Objects.requireNonNull(stream);
+        ValidatingSpliterator.Builder<E, R> builder = new ValidatingSpliterator.Builder<>();
+        ValidatingSpliterator<E, R> spliterator = builder.with(stream.spliterator())
+                .validatedBy(validator)
+                .withValidFunction(transformingIfValid)
+                .withNotValidFunction(transformingIfNotValid)
+                .build();
+        return StreamSupport.stream(spliterator, false);
+    }
+
+    /**
+     * <p>Generates a stream by validating the elements of an input stream one by one using the provided predicate. </p>
+     * <p>An element of the input stream is said to be valid if the provided predicate returns true for this element.</p>
+     * <p>A valid element is transmitted to the returned stream without any transformation. A non-valid element is
+     * replaced by the application of the provided unary operator. </p>
+     * <p>This function calls the general version of <code>validate()</code> with special parameters.</p>
+     * <p>A <code>NullPointerException</code> will be thrown if one of the provided elements is null. </p>
+     * @param stream the stream to be validated.
+     * @param validator the predicate used to validate the elements of the stream.
+     * @param transformingIfNotValid the operator applied to the non-valid elements.
+     * @param <E> the type of the stream and the returned stream.
+     * @return the validated and transformed stream.
+     */
+    public static <E> Stream<E> validate(Stream<E> stream, Predicate<E> validator, UnaryOperator<E> transformingIfNotValid) {
+        return validate(stream, validator, Function.identity(), transformingIfNotValid);
     }
 }

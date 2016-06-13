@@ -57,9 +57,6 @@ public class ZippingSpliterator<E1, E2, R> implements Spliterator<R> {
         }
 
         public ZippingSpliterator<E1, E2, R> build() {
-            Objects.requireNonNull(spliterator1);
-            Objects.requireNonNull(spliterator2);
-            Objects.requireNonNull(zipper);
             return new ZippingSpliterator<>(spliterator1, spliterator2, zipper);
         }
     }
