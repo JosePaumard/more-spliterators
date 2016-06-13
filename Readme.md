@@ -8,7 +8,7 @@ This problem can be solved by creating a spliterator on the original stream spli
 
 The entry point of this API is meant to be the `MoreSpliterators` factory class. Reading the Javadoc is a good ideas, patterns are provided.
 
-So far this API provides six operations
+So far this API provides the following operations.
 
 ## Cycling
 
@@ -43,6 +43,12 @@ The resulting stream is the following:
  ["a02", "a12", "a22", "a32"],
  ["a03", "a13", "a23", "a33"]]
 ```
+
+## Validating
+
+A validating spliterator works with a predicate and two mapping functions. When the predicate applied to the current element of the stream is true, then the first mapper is applied to that element. If it is false, then the second mapper is applied. In both cases the mapped element is added to the new spliterator.
+
+This validating spliterator could also be implemented with a mapping function.
 
 ## Weaving
 
