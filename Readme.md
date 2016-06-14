@@ -50,6 +50,29 @@ A validating spliterator works with a predicate and two mapping functions. When 
 
 This validating spliterator could also be implemented with a mapping function.
 
+## Interrupting
+
+The interrupting spliterator takes an interruptor as a parameter. If this interruptor became false for a given element of the provided stream, then it ends the returned stream.
+
+It has been created to handle the following case. We created an iterating stream on a class hierarchy:
+
+```
+String<Class<?>> streamOfClasses = Stream.iterate(myClass, c -> c == null ? null : c.getSuperclass());
+```
+
+The problem is that, once the `Object.class` has been met, this stream is null. We wanted to stop it. This is exactly what the interrupting spliterator does.
+
+```
+Stream<Class<?>> interruptedStreamOfClasses = MoreSpliterator.interrupting(streamOfClasses, Objects::isNull);
+```
+
+The returned stream in this case will generate elements up to `Object.class` and will stop.
+
+
+## Gating
+
+The gating spliterator does the opposite of the interrupting spliterator. Here we provide a validator. The returned stream will transmit the elements of the input stream one the provided validator has seen a valid element.
+
 ## Weaving
 
 The weaving operator is another version of the traversing operator, it could be seen as a traversing followed by a flatmap. Here is an example:

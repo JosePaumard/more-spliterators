@@ -311,18 +311,18 @@ public class MoreSpliterators {
     }
 
     /**
-     * <p>Generates a stream identical to the provided stream until the validator predicate is false for one element.
+     * <p>Generates a stream identical to the provided stream until the interruptor predicate is false for one element.
      * At that time, the returned stream stops. </p>
-     * <p>A <code>NullPointerException</code> will be thrown if the provided stream of the validator predicate is null.</p>
+     * <p>A <code>NullPointerException</code> will be thrown if the provided stream of the interruptor predicate is null.</p>
      * @param stream the input stream. Will throw a <code>NullPointerException</code> if <code>null</code>.
-     * @param validator the predicate applied to the elements of the input stream.
+     * @param interruptor the predicate applied to the elements of the input stream.
      *                  Will throw a <code>NullPointerException</code> if <code>null</code>.
      * @param <E>
-     * @return a stream that is a copy of the input stream, until the validator becomes false.
+     * @return a stream that is a copy of the input stream, until the interruptor becomes false.
      */
-    public static <E> Stream<E> interrupt(Stream<E> stream, Predicate<E> validator) {
+    public static <E> Stream<E> interrupt(Stream<E> stream, Predicate<E> interruptor) {
         Objects.requireNonNull(stream);
-        InterruptingSpliterator<E> spliterator = InterruptingSpliterator.of(stream.spliterator(), validator);
+        InterruptingSpliterator<E> spliterator = InterruptingSpliterator.of(stream.spliterator(), interruptor);
         return StreamSupport.stream(spliterator, false);
     }
 
