@@ -268,10 +268,13 @@ public class MoreSpliterators {
      * <p>A valid element is replaced in the returned stream by the application of the provided function for valid
      * elements. A non-valid element is replaced by the other function. </p>
      * <p>A <code>NullPointerException</code> will be thrown if one of the provided elements is null. </p>
-     * @param stream the stream to be validated.
+     * @param stream the stream to be validated. Will throw a <code>NullPointerException</code> if <code>null</code>.
      * @param validator the predicate used to validate the elements of the stream.
+     *                  Will throw a <code>NullPointerException</code> if <code>null</code>.
      * @param transformingIfValid the function applied to the valid elements.
+     *                            Will throw a <code>NullPointerException</code> if <code>null</code>.
      * @param transformingIfNotValid the function applied to the non-valid elements.
+     *                               Will throw a <code>NullPointerException</code> if <code>null</code>.
      * @param <E> the type of the elements of the input stream.
      * @param <R> the type of the elements of the returned stream.
      * @return the validated and transformed stream.
@@ -295,13 +298,47 @@ public class MoreSpliterators {
      * replaced by the application of the provided unary operator. </p>
      * <p>This function calls the general version of <code>validate()</code> with special parameters.</p>
      * <p>A <code>NullPointerException</code> will be thrown if one of the provided elements is null. </p>
-     * @param stream the stream to be validated.
+     * @param stream the stream to be validated. Will throw a <code>NullPointerException</code> if <code>null</code>.
      * @param validator the predicate used to validate the elements of the stream.
+     *                  Will throw a <code>NullPointerException</code> if <code>null</code>.
      * @param transformingIfNotValid the operator applied to the non-valid elements.
+     *                               Will throw a <code>NullPointerException</code> if <code>null</code>.
      * @param <E> the type of the stream and the returned stream.
      * @return the validated and transformed stream.
      */
     public static <E> Stream<E> validate(Stream<E> stream, Predicate<E> validator, UnaryOperator<E> transformingIfNotValid) {
         return validate(stream, validator, Function.identity(), transformingIfNotValid);
+    }
+
+    /**
+     * <p>Generates a stream identical to the provided stream until the validator predicate is false for one element.
+     * At that time, the returned stream stops. </p>
+     * <p>A <code>NullPointerException</code> will be thrown if the provided stream of the validator predicate is null.</p>
+     * @param stream the input stream. Will throw a <code>NullPointerException</code> if <code>null</code>.
+     * @param validator the predicate applied to the elements of the input stream.
+     *                  Will throw a <code>NullPointerException</code> if <code>null</code>.
+     * @param <E>
+     * @return a stream that is a copy of the input stream, until the validator becomes false.
+     */
+    public static <E> Stream<E> interrupt(Stream<E> stream, Predicate<E> validator) {
+        Objects.requireNonNull(stream);
+        InterruptingSpliterator<E> spliterator = InterruptingSpliterator.of(stream.spliterator(), validator);
+        return StreamSupport.stream(spliterator, false);
+    }
+
+    /**
+     * <p>Generates a stream that does not generate any element, until the validator becomes true for an element of
+     * the provided stream. From this point, the returns stream is identical to the provided stream. </p>
+     * <p>A <code>NullPointerException</code> will be thrown if the provided stream of the validator predicate is null.</p>
+     * @param stream the input stream. Will throw a <code>NullPointerException</code> if <code>null</code>.
+     * @param validator the predicate applied to the elements of the input stream.
+     *                  Will throw a <code>NullPointerException</code> if <code>null</code>.
+     * @param <E>
+     * @return a stream that starts when the validator becomes true.
+     */
+    public static <E> Stream<E> gate(Stream<E> stream, Predicate<E> validator) {
+        Objects.requireNonNull(stream);
+        GatingSpliterator<E> spliterator = GatingSpliterator.of(stream.spliterator(), validator);
+        return StreamSupport.stream(spliterator, false);
     }
 }

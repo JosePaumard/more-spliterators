@@ -48,14 +48,17 @@ public class InterruptingSpliterator<E> implements Spliterator<E> {
     @Override
     public boolean tryAdvance(Consumer<? super E> action) {
 
-        spliterator.tryAdvance(e -> {
-           if (hasMore.get() && interruptor.test(e)) {
-               action.accept(e);
-           } else {
-               hasMore.set(false);
-           }
-        });
-        return hasMore.get();
+        if (hasMore.get()) {
+            return spliterator.tryAdvance(e -> {
+                if (hasMore.get() && !interruptor.test(e)) {
+                    action.accept(e);
+                } else {
+                    hasMore.set(false);
+                }
+            });
+        } else {
+            return false;
+        }
     }
 
     @Override
