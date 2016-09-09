@@ -14,7 +14,7 @@ You can use this API directly with Maven, by adding the following dependency.
 <dependency>
     <groupId>org.paumard</groupId>
     <artifactId>more-spliterators</artifactId>
-    <version>0.2-SNAPSHOT</version>
+    <version>0.2</version>
 </dependency>
 ```
 
