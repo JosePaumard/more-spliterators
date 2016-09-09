@@ -6,9 +6,19 @@ The right solution is to change the stream itself. Suppose we have a stream `{a,
 
 This problem can be solved by creating a spliterator on the original stream spliterator. This is the object of this API.
 
-The entry point of this API is meant to be the `MoreSpliterators` factory class. Reading the Javadoc is a good ideas, patterns are provided.
+The entry point of this API is meant to be the `MoreSpliterators` factory class. Reading the Javadoc is a good idea, patterns are provided.
 
-So far this API provides the following operations.
+You can use this API directly with Maven, by adding the following dependency.  
+
+```
+<dependency>
+    <groupId>org.paumard</groupId>
+    <artifactId>more-spliterators</artifactId>
+    <version>0.2-SNAPSHOT</version>
+</dependency>
+```
+
+# Operations provided
 
 ## Cycling
 
